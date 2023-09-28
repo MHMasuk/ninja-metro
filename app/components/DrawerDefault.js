@@ -5,11 +5,11 @@ import {
     Drawer,
     Button,
     Typography,
-    IconButton, Tooltip,
+    IconButton, Tooltip, List, ListItem, ListItemPrefix, ListItemSuffix, Chip,
 } from "@material-tailwind/react";
-import {ChevronLeftIcon} from "@heroicons/react/24/solid";
+import {ChevronLeftIcon, FireIcon, MapPinIcon} from "@heroicons/react/24/solid";
 
-export function DrawerDefault() {
+export function DrawerDefault({handleLayerToggle}) {
     const [open, setOpen] = React.useState(false);
 
     const openDrawer = () => setOpen(true);
@@ -18,42 +18,48 @@ export function DrawerDefault() {
     return (
         <React.Fragment>
             <Tooltip content="More layers" placement="left-end">
-                <Button onClick={openDrawer} size="sm">
-                    <ChevronLeftIcon className="h-5 w-5" />
-                </Button>
+                <IconButton className="rounded-full" onClick={openDrawer} size="sm">
+                    <ChevronLeftIcon className="h-4 w-4"/>
+                </IconButton>
             </Tooltip>
 
-            <Drawer open={open} onClose={closeDrawer} overlay={false} placement={"right"} className="p-4">
-                <div className="mb-6 flex items-center justify-between">
-                    <Typography variant="h5" color="blue-gray">
-                        Material Tailwind
-                    </Typography>
-                    <IconButton variant="text" color="blue-gray" onClick={closeDrawer}>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={2}
-                            stroke="currentColor"
-                            className="h-5 w-5"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </IconButton>
-                </div>
-                <Typography color="gray" className="mb-8 pr-4 font-normal">
-                    Material Tailwind features multiple React and HTML components, all
-                    written with Tailwind CSS classes and Material Design guidelines.
+            <Drawer open={open} onClose={closeDrawer} overlay={false} placement={"right"} className="p-1 bg-blend-soft-light">
+                <Typography variant="h5" color="blue-gray">
+                    Layers
                 </Typography>
-                <div className="flex gap-2">
-                    <Button size="sm">Get Started</Button>
-                    <Button size="sm" variant="outlined">
-                        Documentation
-                    </Button>
+                <div className="mb-6 flex items-center justify-between">
+                    {/*<Typography variant="h5" color="blue-gray">*/}
+                    {/*    Material Tailwind*/}
+                    {/*</Typography>*/}
+                    <List className="p-0">
+                        <ListItem
+                            className="group rounded-none py-1.5 px-3 text-sm font-normal text-blue-gray-700 hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white"
+                            onClick={() => handleLayerToggle('ColorRemap')}
+                        >
+                            <ListItemPrefix>
+                                <FireIcon className="h-5 w-5"/>
+                            </ListItemPrefix>
+                            Temperature
+                        </ListItem>
+                        <ListItem
+                            className="rounded-none py-1.5 px-3 text-sm font-normal text-blue-gray-700 hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white"
+                            onClick={() => handleLayerToggle('mvtLayer')}
+                        >
+                            <ListItemPrefix>
+                                <MapPinIcon className="h-5 w-5"/>
+                            </ListItemPrefix>
+                            Wind
+                        </ListItem>
+                        <ListItem
+                            className="rounded-none py-1.5 px-3 text-sm font-normal text-blue-gray-700 hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white"
+                            onClick={() => handleLayerToggle('ColorRemap')}
+                        >
+                            <ListItemPrefix>
+                                <FireIcon className="h-5 w-5"/>
+                            </ListItemPrefix>
+                            Fire
+                        </ListItem>
+                    </List>
                 </div>
             </Drawer>
         </React.Fragment>

@@ -11,8 +11,13 @@
   "dependencies": {
     "@heroicons/react": "^2.0.18",
     "@material-tailwind/react": "^2.1.2",
+    "@turf/helpers": "^6.5.0",
+    "@turf/turf": "^6.5.0",
     "autoprefixer": "10.4.16",
     "chroma-js": "^2.4.2",
+    "d3": "^7.8.5",
+    "d3-scale": "^4.0.2",
+    "date-fns": "^2.30.0",
     "deck.gl": "^8.9.30",
     "deck.gl-particle": "^1.1.0",
     "eslint": "8.50.0",
@@ -23,6 +28,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-map-gl": "^7.1.6",
+    "react-slider": "^2.0.6",
     "tailwindcss": "3.3.3"
   }
 }

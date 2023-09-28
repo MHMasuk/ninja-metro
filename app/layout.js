@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
   const customTheme = {
     drawer: {
       defaultProps: {
-        size: 300,
+        size: 250,
         overlay: true,
         placement: "left",
         overlayProps: undefined,
@@ -57,7 +57,8 @@ export default function RootLayout({ children }) {
   return (
       <ThemeProvider value={customTheme}>
         <html lang="en">
-          <body className="min-h-screen bg-slate-900">
+          {/*<body className="min-h-screen bg-slate-900">*/}
+          <body>
             {children}
           </body>
         </html>

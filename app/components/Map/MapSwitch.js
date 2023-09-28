@@ -1,23 +1,41 @@
 "use client";
 
-import React, {useState, useMemo} from 'react';
+import React, {useState, useMemo, useEffect, useRef} from 'react';
 
 import DeckGL from '@deck.gl/react';
-import {COORDINATE_SYSTEM, _GlobeView as GlobeView, MapView} from '@deck.gl/core';
+import {
+    COORDINATE_SYSTEM,
+    _GlobeView as GlobeView,
+    MapView,
+    LightingEffect,
+    AmbientLight,
+    _SunLight as SunLight
+} from '@deck.gl/core';
 import {MVTLayer} from '@deck.gl/geo-layers';
 import {ParticleLayer} from 'deck.gl-particle';
 import {readPixelsToArray} from '@luma.gl/core';
 
-import Map from 'react-map-gl/maplibre';
+import Map, {Marker, NavigationControl, ScaleControl, Popup} from 'react-map-gl/maplibre';
 import chroma from 'chroma-js';
+import {scaleLinear} from "d3-scale";
+import * as d3 from 'd3';
 
 // components
 import ColorRemapBitmapLayer from '@/app/components/CustomLayers/ColorRemapBitmapLayer';
 import {DrawerDefault} from "@/app/components/DrawerDefault";
 
-
 // materiral tailwind
-import {Button, IconButton, List, ListItem, Input, Tooltip} from "@material-tailwind/react";
+import {
+    Button,
+    IconButton,
+    List,
+    ListItem,
+    Input,
+    Tooltip,
+    Typography,
+    Popover,
+    PopoverHandler, PopoverContent
+} from "@material-tailwind/react";
 
 // heroicons
 import {
@@ -31,12 +49,28 @@ import {
 } from "@heroicons/react/24/solid";
 import {MagnifyingGlassIcon} from "@heroicons/react/20/solid";
 import WindLayerCustom from "@/app/components/CustomLayers/WindLayerCustom";
+import TimeProgressScale from "@/app/components/Scale/TimeProgressScale";
+import DateSlider from "@/app/components/Scale/DateSlider";
+import {BottomDrawer} from "@/app/components/Drawer/BottomDrawer";
+
+
+const ambientLight = new AmbientLight({
+    color: [255, 255, 255],
+    intensity: 0.5
+});
+const sunLight = new SunLight({
+    color: [255, 255, 255],
+    intensity: 2.0,
+    timestamp: 0
+});
+// create lighting effect with light sources
+const lightingEffect = new LightingEffect({ambientLight, sunLight});
 
 const MapSwitch = () => {
     const [rgbColors, setRgbColors] = useState([]);
     const [rgbColorsNew, setRgbColorsNew] = useState([]);
     const [isGlobeView, setIsGlobeView] = useState(false);
-    const [selectedLayers, setSelectedLayers] = useState([]);
+    const [selectedLayers, setSelectedLayers] = useState(['ColorRemap']);
     const [settings, setSettings] = useState({
         time: 30,
         showColorRemap: true,
@@ -52,7 +86,6 @@ const MapSwitch = () => {
         zoom: 2,      // Set the initial zoom level for the globe view
         maxZoom: 16,
     });
-
     const [initialMapViewState, setInitialMapViewState] = useState({
         width: 500,
         height: 500,
@@ -61,6 +94,73 @@ const MapSwitch = () => {
         zoom: 4,            // Set the initial zoom level for the map view
         maxZoom: 16,
     });
+
+    const [openBottomDrawer, setOpenBottomDrawer] = React.useState(false);
+
+    const openBottomDrawerHandle = () => setOpenBottomDrawer(true);
+    const closeBottomDrawerHandle = () => setOpenBottomDrawer(false);
+
+    // // d3 scale
+    // // Create an array of date objects (e.g., one week)
+    const startDate = new Date(); // Today's date
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6); // One week from today
+    // const dateArray = d3.timeDay.range(startDate, endDate);
+    //
+    // const width = 500; // Adjust the width as needed
+    // const height = 75; // Adjust the height as needed
+    //
+    // // Use a useRef to keep a reference to the scale container
+    // const scaleContainerRef = useRef(null);
+    //
+    // useEffect(() => {
+    //     // Remove any existing scales
+    //     d3.select(scaleContainerRef.current).selectAll('svg').remove();
+    //
+    //     // Append SVG to the scale container
+    //     const svg = d3.select(scaleContainerRef.current)
+    //         .append("svg")
+    //         .attr("width", width)
+    //         .attr("height", height);
+    //
+    //     // Create scale
+    //     const xScale = d3.scaleTime()
+    //         .domain(d3.extent(dateArray))
+    //         .range([0, width - 10]);
+    //
+    //     // Add scales to axis
+    //     const x_axis = d3.axisBottom()
+    //         .scale(xScale)
+    //         .tickFormat((date, i) => {
+    //             const dayFormat = d3.timeFormat('%a');
+    //             const dateFormat = d3.timeFormat('%d');
+    //             if (i === 0 || i === dateArray.length - 1) {
+    //                 // Add spaces before and after the first and last labels
+    //                 return `  ${dayFormat(date)} ${dateFormat(date)}  `;
+    //             } else {
+    //                 return `${dayFormat(date)} ${dateFormat(date)}`;
+    //             }
+    //         });
+    //
+    //     // Append group and insert axis
+    //     const axisGroup = svg.append("g")
+    //         .call(x_axis);
+    //
+    //     // Apply CSS styles to make line and text bold
+    //     axisGroup.selectAll("line")
+    //         .style("stroke-width", "2"); // Make line bold
+    //
+    //     axisGroup.selectAll("text")
+    //         .style("font-weight", "bold"); // Make text bold
+    // }, [dateArray]);
+
+
+    const [selectedDate, setSelectedDate] = useState(startDate);
+
+    const handleDateChange = (newDate) => {
+        setSelectedDate(newDate);
+        // You can perform any additional actions here when the date changes
+    };
 
     const handleToggleViewMode = () => {
         setIsGlobeView((prevIsGlobeView) => !prevIsGlobeView);
@@ -80,6 +180,8 @@ const MapSwitch = () => {
             .mode('lch')
             .colors(20);
         setRgbColorsNew(colorsNew.map((c) => chroma(c).rgb()));
+
+        setSelectedLayers(['ColorRemap']);
     }, []);
 
     const temparatureLayer = useMemo(() => {
@@ -172,13 +274,21 @@ const MapSwitch = () => {
                         console.log('Coordinates of picked pixel:', coordinate);
                         console.log('Clicked layer:', layer);
                         console.log('Click position in local x, y:', {x, y});
-                        return {
-                            html: `<div><b>Coordinates:</b> ${x}</div>`,
-                            style: {
-                                backgroundColor: 'darkgray',
-                                color: 'white',
-                            },
-                        }
+                        return `<div
+                            style={{
+                                position: 'absolute',
+                                left: 0,
+                                top: 0,
+                                transform: translate(90px, 23px),
+                                width: '24px',
+                                height: '24px',
+                                backgroundColor: 'red',
+                                borderRadius: '50%',
+                            }}
+                        >
+                            <h1>Hello</h1>
+                        </div>`
+
                     }
                 },
             }),
@@ -237,13 +347,34 @@ const MapSwitch = () => {
         }
     };
 
-    const handleLayerToggle = (layerName) => {
-        // Clear the selectedLayers array
-        setSelectedLayers([]);
+    // const handleLayerToggle = (layerName) => {
+    //     // Clear the selectedLayers array
+    //     setSelectedLayers([]);
+    //
+    //     // Add the clicked layer to the selectedLayers array
+    //     setSelectedLayers([layerName]);
+    // };
 
-        // Add the clicked layer to the selectedLayers array
-        setSelectedLayers([layerName]);
+
+    const handleLayerToggle = (layerName) => {
+        setSelectedLayers((prevSelectedLayers) => {
+            if (prevSelectedLayers.includes('windLayer')) {
+                // If the "WindLayer" is already selected, keep it selected and add the new layer
+                if (prevSelectedLayers.includes(layerName)) {
+                    // If the new layer is already selected, do nothing
+                    // return prevSelectedLayers;
+                    return [layerName, 'windLayer']
+                } else {
+                    // If the new layer is not selected, add it to the existing selection
+                    return [layerName, 'windLayer'];
+                }
+            } else {
+                // If the "WindLayer" is not in the selection, handle the selection normally (replace current selections)
+                return [layerName];
+            }
+        });
     };
+
 
     const isLayerSelected = (layerName) => selectedLayers.includes(layerName);
 
@@ -278,40 +409,64 @@ const MapSwitch = () => {
         }))
     };
 
+
+    // const getTooltip = ({object}) => {
+    //     if (!object) {
+    //         return null;
+    //     }
+    //     const lat = object.position[1];
+    //     const lng = object.position[0];
+    //
+    //     return `\
+    //         latitude: ${Number.isFinite(lat) ? lat.toFixed(6) : ''}
+    //         longitude: ${Number.isFinite(lng) ? lng.toFixed(6) : ''}`;
+    // }
+
     return (
         <div>
             <DeckGL
                 layers={layers}
                 initialViewState={isGlobeView ? viewport : initialMapViewState}
                 controller={true}
-                // onViewStateChange={(newViewport) => setViewport(newViewport)}
+                effects={[lightingEffect]}
             >
                 {isGlobeView ? (
-                    <GlobeView id="globe" repeat={true} resolution={5}/>
+                    <GlobeView id="globe" repeat={true} resolution={5} views={'globe'} />
+
                 ) : (
                     <MapView id="map" repeat={true}>
                         <Map
                             mapStyle="https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json"
                         />
+
                     </MapView>
                 )}
+
             </DeckGL>
 
-            {/* Main search bar */}
-            <div className="p-2 w-72">
-                {/*<Input icon={<MagnifyingGlassIcon className="h-5 w-5 text-black" />} label="Search" color="black" className="border-white bg-white" />*/}
-                <Input
-                    type="email"
-                    placeholder="Search Location"
-                    className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
-                    labelProps={{
-                        className: "hidden",
-                    }}
-                    containerProps={{className: "min-w-[100px]"}}
-                    icon={<MagnifyingGlassIcon className="h-5 w-5 text-black"/>}
-                />
-            </div>
+            {/*<div className="absolute">*/}
+            {/*    <Marker longitude={90} latitude={23} anchor="bottom" className="z-50">*/}
+            {/*        <PlusIcon className="h-16 w-16"/>*/}
+            {/*    </Marker>*/}
+            {/*</div>*/}
 
+            {/* Main search bar */}
+            <div className="absolute flex items-center ml-4">
+               <Typography variant="h3"> Logo </Typography>
+                <div className="p-2 w-72">
+                    {/*<Input icon={<MagnifyingGlassIcon className="h-5 w-5 text-black" />} label="Search" color="black" className="border-white bg-white" />*/}
+                    <Input
+                        type="email"
+                        placeholder="Search Location"
+                        className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
+                        labelProps={{
+                            className: "hidden",
+                        }}
+                        containerProps={{className: "min-w-[100px]"}}
+                        icon={<MagnifyingGlassIcon className="h-5 w-5 text-black"/>}
+                    />
+                </div>
+            </div>
 
             {/* Right side menu start */}
             <div className="absolute top-2 right-2 text-center">
@@ -320,14 +475,14 @@ const MapSwitch = () => {
                         <div className="mb-1">
                             <Tooltip content="Zoom In" placement="left-end">
                                 <IconButton className="rounded-full" size="sm" onClick={handleZoomIn}>
-                                    <PlusIcon className="h-5 w-5"/>
+                                    <PlusIcon className="h-4 w-4"/>
                                 </IconButton>
                             </Tooltip>
                         </div>
                         <div>
                             <Tooltip content="Zoom Out" placement="left-end">
                                 <IconButton className="rounded-full" size="sm" onClick={handleZoomOut}>
-                                    <MinusIcon className="h-5 w-5"/>
+                                    <MinusIcon className="h-4 w-4"/>
                                 </IconButton>
                             </Tooltip>
                         </div>
@@ -344,7 +499,7 @@ const MapSwitch = () => {
                         <div>
                             <Tooltip content="Zoom Out" placement="left-end">
                                 <IconButton className="rounded-full" size="sm" onClick={handleMapViewZoomOut}>
-                                    <MinusIcon className="h-5 w-5"/>
+                                    <MinusIcon className="h-4 w-4"/>
                                 </IconButton>
                             </Tooltip>
                         </div>
@@ -356,7 +511,7 @@ const MapSwitch = () => {
                         <div className="mb-1">
                             <Tooltip content="2D Mode" placement="left-end">
                                 <Button className="rounded-full" size="sm" onClick={handleToggleViewMode}>
-                                    <MapIcon className="h-5 w-5"/>
+                                    <MapIcon className="h-4 w-4"/>
                                 </Button>
                             </Tooltip>
                         </div>
@@ -364,9 +519,9 @@ const MapSwitch = () => {
                     ) : (
                         <div className="mb-1">
                             <Tooltip content="3D Mode" placement="left-end">
-                                <Button className="rounded-full" size="sm" onClick={handleToggleViewMode}>
-                                    <GlobeAltIcon className="h-5 w-5"/>
-                                </Button>
+                                <IconButton className="rounded-full" size="sm" onClick={handleToggleViewMode}>
+                                    <GlobeAltIcon className="h-4 w-4"/>
+                                </IconButton>
 
                             </Tooltip>
                         </div>
@@ -386,7 +541,7 @@ const MapSwitch = () => {
                                 size="sm"
                                 onClick={() => handleLayerToggle('ColorRemap')}
                             >
-                                <FireIcon className="h-5 w-5"/>
+                                <FireIcon className="h-4 w-4"/>
                             </IconButton>
                         </Tooltip>
                     </div>
@@ -401,16 +556,62 @@ const MapSwitch = () => {
                                 size="sm"
                                 onClick={() => handleLayerToggle('mvtLayer')}
                             >
-                                <MapPinIcon className="h-5 w-5"/>
+                                <MapPinIcon className="h-4 w-4"/>
                             </IconButton>
                         </Tooltip>
                     </div>
 
                 </div>
+                {/* Main layer menu section End */}
 
-                {/*<h1>This is Common layer</h1>*/}
+                {/* Drawer start */}
+                <div className="mt-1">
+                    <DrawerDefault handleLayerToggle={handleLayerToggle}/>
+                </div>
+                {/* Drawer End */}
 
-                <div className="mb-1">
+                {/* Bottom drawer start */}
+                <div className="mt-1">
+                    <BottomDrawer
+                        handleLayerToggle={handleLayerToggle}
+                        openBottomDrawerHandle={openBottomDrawerHandle}
+                        closeBottomDrawerHandle={closeBottomDrawerHandle}
+                        openBottomDrawer={openBottomDrawer}
+                    />
+                </div>
+                {/* Bottom drawer End */}
+            </div>
+            {/* Right side menu END */}
+
+
+            {/* Bottom left icon */}
+            <div className="absolute bottom-10 left-14 w-1/2">
+                <div className="">
+                    <div style={{height: 8, width: '100%', display: 'flex', flexDirection: 'row'}}>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(254, 246, 181)'}}/>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 221, 154)'}}/>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 194, 133)'}}/>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 166, 121)'}}/>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(250, 138, 118)'}}/>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(241, 109, 122)'}}/>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(225, 83, 131)'}}/>
+                    </div>
+                    <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
+                        <div style={{width: '14.28%'}}>0</div>
+                        <div style={{width: '14.28%'}}>25</div>
+                        <div style={{width: '14.28%'}}>50</div>
+                        <div style={{width: '14.28%'}}>100</div>
+                        <div style={{width: '14.28%'}}>300</div>
+                        <div style={{width: '14.28%'}}>500</div>
+                        <div style={{width: '14.28%'}}>1000</div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom right icon */}
+            {/* This all are common layer */}
+            <div className="absolute bottom-10 right-5 text-right">
+                <div className="mb-5">
                     <Tooltip content="Particles" placement="left-end">
                         <IconButton
                             className={`rounded-full ${
@@ -420,22 +621,33 @@ const MapSwitch = () => {
                             size="sm"
                             onClick={() => handleLayerToggleNew('windLayer')}
                         >
-                            <ArrowTrendingUpIcon className="h-5 w-5"/>
+                            <ArrowTrendingUpIcon className="h-4 w-4"/>
                         </IconButton>
                     </Tooltip>
                 </div>
 
-
-                {/* Main layer menu section End */}
-
-                {/* Drawer start */}
-                <div className="mt-1">
-                    <DrawerDefault/>
+                <div className="w-72">
+                    <div style={{height: 8, width: '100%', display: 'flex', flexDirection: 'row'}}>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(254, 246, 181)'}}/>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 221, 154)'}}/>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 194, 133)'}}/>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 166, 121)'}}/>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(250, 138, 118)'}}/>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(241, 109, 122)'}}/>
+                        <div style={{flex: '0 0 14.28%', background: 'rgb(225, 83, 131)'}}/>
+                    </div>
+                    <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
+                        <div style={{width: '14.28%'}}>0</div>
+                        <div style={{width: '14.28%'}}>20</div>
+                        <div style={{width: '14.28%'}}>40</div>
+                        <div style={{width: '14.28%'}}>60</div>
+                        <div style={{width: '14.28%'}}>80</div>
+                        <div style={{width: '14.28%'}}>100</div>
+                        <div style={{width: '14.28%'}}>130</div>
+                    </div>
                 </div>
-                {/* Drawer End */}
 
             </div>
-            {/* Right side menu END */}
         </div>
     );
 };
