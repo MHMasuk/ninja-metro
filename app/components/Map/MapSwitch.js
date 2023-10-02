@@ -52,19 +52,42 @@ import WindLayerCustom from "@/app/components/CustomLayers/WindLayerCustom";
 import TimeProgressScale from "@/app/components/Scale/TimeProgressScale";
 import DateSlider from "@/app/components/Scale/DateSlider";
 import {BottomDrawer} from "@/app/components/Drawer/BottomDrawer";
+import GradientBar from "@/app/components/GradientBar";
 
 
+// const ambientLight = new AmbientLight({
+//     color: [255, 255, 255],
+//     intensity: 0.5
+// });
+// const sunLight = new SunLight({
+//     color: [255, 255, 255],
+//     intensity: 2.0,
+//     timestamp: 0
+// });
+// // create lighting effect with light sources
+// const lightingEffect = new LightingEffect({ambientLight, sunLight});
+import {PointLight, DirectionalLight} from '@deck.gl/core';
+
+// create ambient light source
 const ambientLight = new AmbientLight({
     color: [255, 255, 255],
-    intensity: 0.5
+    intensity: 1.0
 });
-const sunLight = new SunLight({
+// create point light source
+const pointLight = new PointLight({
     color: [255, 255, 255],
     intensity: 2.0,
-    timestamp: 0
+    // use coordinate system as the same as view state
+    position: [-125, 50.5, 5000]
+});
+// create directional light source
+const directionalLight = new DirectionalLight({
+    color: [255, 255, 255],
+    intensity: 1.0,
+    direction: [-3, -9, -1]
 });
 // create lighting effect with light sources
-const lightingEffect = new LightingEffect({ambientLight, sunLight});
+const lightingEffect = new LightingEffect({ambientLight, pointLight, directionalLight});
 
 const MapSwitch = () => {
     const [rgbColors, setRgbColors] = useState([]);
@@ -422,13 +445,31 @@ const MapSwitch = () => {
     //         longitude: ${Number.isFinite(lng) ? lng.toFixed(6) : ''}`;
     // }
 
+    const legendStyle = {
+        "background": 'linear-gradient(to right, rgb(98, 113, 184), rgb(98, 113, 184), rgb(98, 113, 184), rgb(98, 113, 184), rgb(61, 110, 163), rgb(74, 148, 170), rgb(74, 146, 148), rgb(77, 142, 124), rgb(76, 164, 76), rgb(103, 164, 54), rgb(162, 135, 64), rgb(162, 109, 92), rgb(141, 63, 92), rgb(151, 75, 145), rgb(95, 100, 160), rgb(91, 136, 161), rgb(91, 136, 161))',
+        "width": '100%',
+        "background-color": '#7c7c7c',
+        "white-space": 'nowrap',
+        "font-size": '12px',
+        "box-shadow": '0 0 4px 0 black'
+    }
+
+    const gradientStops = [
+        { color: 'blue', percentage: 0 },
+        { color: 'green', percentage: 20 },
+        { color: 'yellow', percentage: 40 },
+        { color: 'red', percentage: 60 },
+        { color: 'blue', percentage: 80 },
+        { color: 'blue', percentage: 100 }
+    ];
+
     return (
         <div>
             <DeckGL
                 layers={layers}
                 initialViewState={isGlobeView ? viewport : initialMapViewState}
                 controller={true}
-                effects={[lightingEffect]}
+                effects={lightingEffect}
             >
                 {isGlobeView ? (
                     <GlobeView id="globe" repeat={true} resolution={5} views={'globe'} />
@@ -438,7 +479,6 @@ const MapSwitch = () => {
                         <Map
                             mapStyle="https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json"
                         />
-
                     </MapView>
                 )}
 
@@ -626,25 +666,29 @@ const MapSwitch = () => {
                     </Tooltip>
                 </div>
 
-                <div className="w-72">
-                    <div style={{height: 8, width: '100%', display: 'flex', flexDirection: 'row'}}>
-                        <div style={{flex: '0 0 14.28%', background: 'rgb(254, 246, 181)'}}/>
-                        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 221, 154)'}}/>
-                        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 194, 133)'}}/>
-                        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 166, 121)'}}/>
-                        <div style={{flex: '0 0 14.28%', background: 'rgb(250, 138, 118)'}}/>
-                        <div style={{flex: '0 0 14.28%', background: 'rgb(241, 109, 122)'}}/>
-                        <div style={{flex: '0 0 14.28%', background: 'rgb(225, 83, 131)'}}/>
-                    </div>
-                    <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
-                        <div style={{width: '14.28%'}}>0</div>
-                        <div style={{width: '14.28%'}}>20</div>
-                        <div style={{width: '14.28%'}}>40</div>
-                        <div style={{width: '14.28%'}}>60</div>
-                        <div style={{width: '14.28%'}}>80</div>
-                        <div style={{width: '14.28%'}}>100</div>
-                        <div style={{width: '14.28%'}}>130</div>
-                    </div>
+                {/*<div className="w-72">*/}
+                {/*    <div style={{height: 8, width: '100%', display: 'flex', flexDirection: 'row'}}>*/}
+                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(254, 246, 181)'}}/>*/}
+                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 221, 154)'}}/>*/}
+                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 194, 133)'}}/>*/}
+                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 166, 121)'}}/>*/}
+                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(250, 138, 118)'}}/>*/}
+                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(241, 109, 122)'}}/>*/}
+                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(225, 83, 131)'}}/>*/}
+                {/*    </div>*/}
+                {/*    <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>*/}
+                {/*        <div style={{width: '14.28%'}}>0</div>*/}
+                {/*        <div style={{width: '14.28%'}}>20</div>*/}
+                {/*        <div style={{width: '14.28%'}}>40</div>*/}
+                {/*        <div style={{width: '14.28%'}}>60</div>*/}
+                {/*        <div style={{width: '14.28%'}}>80</div>*/}
+                {/*        <div style={{width: '14.28%'}}>100</div>*/}
+                {/*        <div style={{width: '14.28%'}}>130</div>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
+
+                <div className="w-72 rounded-full">
+                    <GradientBar stops={gradientStops} />
                 </div>
 
             </div>
