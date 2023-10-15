@@ -20,7 +20,23 @@ export default function RootLayout({ children }) {
         placement: "left",
         overlayProps: undefined,
         className: "",
-        dismiss: undefined,
+        // dismiss: undefined,
+        // dismiss: {
+        //   enabled: boolean;
+        //   escapeKey: boolean;
+        //   referencePress: boolean;
+        //   referencePressEvent: 'pointerdown' | 'mousedown' | 'click';
+        //   outsidePress: boolean | ((event: MouseEvent) => boolean);
+        //   outsidePressEvent: 'pointerdown' | 'mousedown' | 'click';
+        //   ancestorScroll: boolean;
+        //   bubbles: boolean | {
+        //     escapeKey: boolean;
+        //     outsidePress: boolean;
+        //   };
+        // };
+        dismiss: {
+          enabled: false
+        },
         onClose: undefined,
         transition: {
           type: "tween",

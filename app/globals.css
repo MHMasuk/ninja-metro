@@ -3,25 +3,112 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+    :root {
+        --foreground-rgb: 255, 255, 255;
+        --background-start-rgb: 0, 0, 0;
+        --background-end-rgb: 0, 0, 0;
+    }
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient(
+            to bottom,
+            transparent,
+            rgb(var(--background-end-rgb))
+    ) rgb(var(--background-start-rgb));
+}
+
+/* Add these classes to your Tailwind CSS styles */
+.slider-mark {
+    position: absolute;
+    transform: translateX(-50%);
+    bottom: 10px;
+    font-size: 12px;
+    color: #666;
+}
+
+/*.slider-mark-active {*/
+/*  color: #000;*/
+/*  font-weight: bold;*/
+/*}*/
+
+/*!* Add these styles to your CSS *!*/
+/*.slider-mark {*/
+/*  position: relative;*/
+/*}*/
+
+.slider-tooltip {
+    position: absolute;
+    top: -30px; /* Adjust this value to position the tooltip correctly */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    pointer-events: none;
+}
+
+.slider-mark:hover .slider-tooltip {
+    opacity: 1;
+}
+
+/*.slider-date-range {*/
+/*  position: absolute;*/
+/*  bottom: -20px;*/
+/*  transform: translateX(-50%);*/
+/*  font-size: 12px;*/
+/*  white-space: nowrap; !* Prevents date overflow *!*/
+/*}*/
+
+.slider-vertical-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #000;
+}
+
+.vertical-line {
+    position: absolute;
+    bottom: 0;
+    width: 2px;
+    background-color: red; /* Change color as needed */
+    height: 100%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    font-size: 12px;
+}
+
+.slider-date-range {
+  position: absolute;
+  bottom: -20px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  white-space: nowrap; /* Prevents date overflow */
+}
+
+.date-divider {
+    width: 1px;
+    height: 20px;
+    background-color: #ccc;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    /*z-index: -1; !* Place the divider line below the slider *!*/
 }

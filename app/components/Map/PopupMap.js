@@ -2,7 +2,6 @@
 
 import React, {useState, useMemo, useEffect, useRef} from 'react';
 
-import 'maplibre-gl/dist/maplibre-gl.css';
 import DeckGL from '@deck.gl/react';
 import {
     COORDINATE_SYSTEM,
@@ -15,8 +14,9 @@ import {
 import {MVTLayer} from '@deck.gl/geo-layers';
 import {ParticleLayer} from 'deck.gl-particle';
 import {readPixelsToArray} from '@luma.gl/core';
+// import { _MapContext as MapContext, StaticMap, Popup } from "react-map-gl";
 
-import Map, {Marker, NavigationControl, ScaleControl, Popup} from 'react-map-gl/maplibre';
+import Map, {_MapContext as MapContext, Marker, NavigationControl, ScaleControl, Popup, StaticMap} from 'react-map-gl/maplibre';
 import chroma from 'chroma-js';
 import {scaleLinear} from "d3-scale";
 import * as d3 from 'd3';
@@ -35,8 +35,7 @@ import {
     Tooltip,
     Typography,
     Popover,
-    PopoverHandler, PopoverContent, Chip
-
+    PopoverHandler, PopoverContent
 } from "@material-tailwind/react";
 
 // heroicons
@@ -73,7 +72,6 @@ import VerticalProgressBar from "@/app/components/Scale/VerticalProgressBar";
 import ProgressBar from "@/app/components/Scale/ProgressBar";
 import TemperatureBar from "@/app/components/Scale/TemparatureBar";
 import TimeSlider from "@/app/components/slider/TimeSlider";
-import {ChevronDownIcon, StopCircleIcon, XMarkIcon} from "@heroicons/react/24/outline";
 
 // create ambient light source
 const ambientLight = new AmbientLight({
@@ -96,10 +94,25 @@ const directionalLight = new DirectionalLight({
 // create lighting effect with light sources
 const lightingEffect = new LightingEffect({ambientLight, pointLight, directionalLight});
 
-const MAP_VIEW = new MapView({repeat: true});
 
-const MapSwitch = () => {
-    const [locationInfo, setLocationInfo] = useState(null)
+const DATA = [
+    [-74.0331, 40.7378, "thing 1"],
+    [-73.9991, 40.7236, "thing 2"],
+    [-73.9991, 40.7357, "thing 3"],
+    [-73.9768, 40.7553, "thing 4"],
+    [-73.9768, 40.7627, "thing 5"],
+    [-73.9767, 40.644, "thing 6"],
+    [-73.9767, 40.6497, "thing 7"],
+    [-73.9677, 40.7689, "thing 8"],
+    [-73.9676, 40.5969, "thing 9"],
+    [-73.9676, 40.6047, "thing 10"],
+    [-73.9442, 40.708, "thing 11"]
+];
+
+
+const PopupMap = () => {
+    const [selected, setSelected] = useState(null);
+    const [toggle, setToggle] = useState(false);
     const [rgbColors, setRgbColors] = useState([]);
     const [rgbColorsNew, setRgbColorsNew] = useState([]);
     const [isGlobeView, setIsGlobeView] = useState(false);
@@ -130,9 +143,7 @@ const MapSwitch = () => {
 
     const [openBottomDrawer, setOpenBottomDrawer] = React.useState(false);
 
-    const openBottomDrawerHandle = () => {
-        setOpenBottomDrawer(true);
-    }
+    const openBottomDrawerHandle = () => setOpenBottomDrawer(true);
     const closeBottomDrawerHandle = () => setOpenBottomDrawer(false);
 
     // // d3 scale
@@ -308,8 +319,25 @@ const MapSwitch = () => {
                         console.log('Coordinates of picked pixel:', coordinate);
                         console.log('Clicked layer:', layer);
                         console.log('Click position in local x, y:', {x, y});
+                        return `<div
+                            style={{
+                                position: 'absolute',
+                                left: 0,
+                                top: 0,
+                                transform: translate(90px, 23px),
+                                width: '24px',
+                                height: '24px',
+                                backgroundColor: 'red',
+                                borderRadius: '50%',
+                            }}
+                        >
+                            <h1>Hello</h1>
+                        </div>`
+
                     }
                 },
+                onHover: (info, event) => console.log('Hovered:', info, event),
+                // onClick: (info, event) => console.log('Clicked:', info, event)
             }),
             selectedLayers.includes('mvtLayer') &&
             settings.showMvtLayer &&
@@ -473,108 +501,77 @@ const MapSwitch = () => {
         { percentage: 60, color: 'red-900' },
     ];
 
-    const [clickedtext, setClickedtext] = useState({})
-    const [showMarker, setShowMarker] = useState(false)
-
-    const expandTooltip = info => {
-        console.log("expandTooltip", info)
-        setClickedtext(info);
-        setShowMarker(true)
-    };
-
-    const textToDisplay = (info) => {
-        console.log("textToDisplay //////", info)
-        if (info && showMarker) {
-            const pixelColor = readPixelsToArray(info.layer.props.image, {
-                sourceX: info.bitmap.pixel[0],
-                sourceY: info.bitmap.pixel[1],
-                sourceWidth: 1,
-                sourceHeight: 1,
-            });
-
-            return (
-                <div className="absolute bg-transparent" style={{left: info.x, top: info.y}}>
-                    {/*<div>*/}
-                    {/*    <MinusIcon className="h-4 w-4"/>*/}
-                    {/*    /!*<XMarkIcon className="h-4 w-4" onClick={turnOffMarker}/>*!/*/}
-                    {/*    <div className="flex">*/}
-                    {/*        <div className="relative w-1/4">*/}
-                    {/*            <div className="absolute top-0 right-0">*/}
-                    {/*                <XMarkIcon className="h-4 w-4" onClick={turnOffMarker}/>*/}
-                    {/*            </div>*/}
-                    {/*            Div 1*/}
-
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
-
-                    <div className="max-w-md mx-auto overflow-hidden shadow-lg relative">
-                        <StopCircleIcon className="h-6 w-6 absolute top-2 left-0"/>
-                        <XMarkIcon className="h-6 w-6 absolute top-2 right-2 p-1" onClick={turnOffMarker}/>
-                        <Tooltip content="Forcast of this location" className="text-xs">
-                            <ChevronDownIcon className="h-8 w-8 absolute top-6 right-5 p-2 bg-white rounded-full font-bold" onClick={openBottomDrawerHandle}/>
-                        </Tooltip>
-
-                        {/*<button className="absolute top-2 right-2 p-1 bg-gray-50 text-black text-xs rounded-full mb-1">X</button>*/}
-                        <div className="p-4">
-                            <h5 className="text-xl font-bold mt-3">
-                                <p>coordinate: {info.coordinate[0]}</p>
-                                <p>{info.coordinate[1]}</p>
-                                <p>pixelColor: {pixelColor}</p>
-                            </h5>
-                        </div>
-                    </div>
-                </div>
-                // <Tooltip content="Material Tailwind" placement="top">
-                //     <div className="absolute bg-transparent" style={{left: info.x, top: info.y}}>You clicked the map {info.x} {info.y}</div>
-                // </Tooltip>
-                // <div style={{left: , top: y}}>You clicked the map {info.x} {info.y}</div>
-
-            )
-        }
-    }
-
-    const turnOffMarker = () => {
-        setShowMarker(false)
-        setClickedtext({})
-    }
-
     return (
         <div>
             <DeckGL
-                // style={{width: "100vw", height: "100vh"}}
                 layers={layers}
                 initialViewState={isGlobeView ? viewport : initialMapViewState}
                 controller={true}
-                // effects={[lightingEffect]}
-                // views={MAP_VIEW}
-                onClick={expandTooltip}
+                effects={[lightingEffect]}
+                onClick={({ x, y, coordinate, lngLat, layer, color, object, index }) => {
+                    // TODO: figure out how to get rid of extra click event
+                    console.log("deck onClick", object);
+                    if (object) {
+                        setSelected({ x, y, coordinate, object });
+                    } else {
+                        // clicked off an object
+                        setSelected(null);
+                    }
+                }}
+                ContextProvider={MapContext}
+                onHover={this._onHover}
             >
-                {isGlobeView ? (
-                    <GlobeView id="globe" repeat={true} resolution={5} views={'globe'} > </GlobeView>
-                ) : (
-                    <MapView id="map" repeat={true}>
-                        <Map
-                            // style={{width: "100vw", height: "100vh"}}
-                            // mapStyle="https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json"
-                        >
-                        </Map>
-                    </MapView>
-                )}
+                {/*{isGlobeView ? (*/}
+                {/*    <GlobeView id="globe" repeat={true} resolution={5} views={'globe'} />*/}
 
-                {/*<div className="absolute z-50">*/}
-                {/*    <Marker longitude={90} latitude={23} anchor="bottom">*/}
-                {/*        <PlusIcon className="h-16 w-16 z-50"/>*/}
-                {/*    </Marker>*/}
-                {/*</div>*/}
+                {/*) : (*/}
+                {/*    <div>*/}
+                {/*    <Map id="map" repeat={true}>*/}
+                {/*        <Map*/}
+                {/*            mapStyle="https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json"*/}
+                {/*        />*/}
+                {/*    </Map>*/}
+                {/*    </div>*/}
+                {/*)}*/}
+
+                <div>
+                    <Map id="map" repeat={true}>
+                        {/*<Map*/}
+                        {/*    mapStyle="https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json"*/}
+                        {/*/>*/}
+                    </Map>
+                </div>
+
+                {selected && (
+                    <div className="absolute">
+                        <Popup
+                            longitude={selected.coordinate[0]}
+                            latitude={selected.coordinate[1]}
+                            closeButton={false}
+                            anchor="left"
+                            offsetLeft={10}
+                        >
+                            <div className="absolute">
+                                <h1>Data fdsfsaff</h1>
+                            </div>
+                        </Popup>
+                        <h1> fdsfsdfsdfsdf</h1>
+                    </div>
+                )}
 
             </DeckGL>
 
+            {/*<div className="absolute">*/}
+            {/*    <Marker longitude={90} latitude={23} anchor="bottom" className="z-50">*/}
+            {/*        <PlusIcon className="h-16 w-16"/>*/}
+            {/*    </Marker>*/}
+            {/*</div>*/}
 
-             {/*Main search bar*/}
+            {/* Main search bar */}
             <div className="absolute flex items-center ml-4">
-                {textToDisplay(clickedtext)}
-               <Typography variant="h3"> Logo </Typography>
+
+                <h1> fdsfsdfsdfsdf</h1>
+                <Typography variant="h3"> Logo </Typography>
                 <div className="p-2 w-72">
                     {/*<Input icon={<MagnifyingGlassIcon className="h-5 w-5 text-black" />} label="Search" color="black" className="border-white bg-white" />*/}
                     <Input
@@ -644,6 +641,7 @@ const MapSwitch = () => {
                                 <IconButton className="rounded-full" size="sm" onClick={handleToggleViewMode}>
                                     <GlobeAltIcon className="h-4 w-4"/>
                                 </IconButton>
+
                             </Tooltip>
                         </div>
                     )}
@@ -694,7 +692,6 @@ const MapSwitch = () => {
                 {/* Bottom drawer start */}
                 <div className="mt-1">
                     <BottomDrawer
-                        locationInfo={clickedtext}
                         handleLayerToggle={handleLayerToggle}
                         openBottomDrawerHandle={openBottomDrawerHandle}
                         closeBottomDrawerHandle={closeBottomDrawerHandle}
@@ -760,4 +757,4 @@ const MapSwitch = () => {
     );
 };
 
-export default MapSwitch;
+export default PopupMap;
