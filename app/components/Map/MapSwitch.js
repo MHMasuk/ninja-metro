@@ -80,6 +80,7 @@ const ambientLight = new AmbientLight({
     color: [255, 255, 255],
     intensity: 1.0
 });
+
 // create point light source
 const pointLight = new PointLight({
     color: [255, 255, 255],
@@ -87,16 +88,16 @@ const pointLight = new PointLight({
     // use coordinate system as the same as view state
     position: [-125, 50.5, 5000]
 });
+
 // create directional light source
 const directionalLight = new DirectionalLight({
     color: [255, 255, 255],
     intensity: 1.0,
     direction: [-3, -9, -1]
 });
+
 // create lighting effect with light sources
 const lightingEffect = new LightingEffect({ambientLight, pointLight, directionalLight});
-
-const MAP_VIEW = new MapView({repeat: true});
 
 const MapSwitch = () => {
     const [locationInfo, setLocationInfo] = useState(null)
@@ -140,56 +141,6 @@ const MapSwitch = () => {
     const startDate = new Date(); // Today's date
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 6); // One week from today
-    // const dateArray = d3.timeDay.range(startDate, endDate);
-    //
-    // const width = 500; // Adjust the width as needed
-    // const height = 75; // Adjust the height as needed
-    //
-    // // Use a useRef to keep a reference to the scale container
-    // const scaleContainerRef = useRef(null);
-    //
-    // useEffect(() => {
-    //     // Remove any existing scales
-    //     d3.select(scaleContainerRef.current).selectAll('svg').remove();
-    //
-    //     // Append SVG to the scale container
-    //     const svg = d3.select(scaleContainerRef.current)
-    //         .append("svg")
-    //         .attr("width", width)
-    //         .attr("height", height);
-    //
-    //     // Create scale
-    //     const xScale = d3.scaleTime()
-    //         .domain(d3.extent(dateArray))
-    //         .range([0, width - 10]);
-    //
-    //     // Add scales to axis
-    //     const x_axis = d3.axisBottom()
-    //         .scale(xScale)
-    //         .tickFormat((date, i) => {
-    //             const dayFormat = d3.timeFormat('%a');
-    //             const dateFormat = d3.timeFormat('%d');
-    //             if (i === 0 || i === dateArray.length - 1) {
-    //                 // Add spaces before and after the first and last labels
-    //                 return `  ${dayFormat(date)} ${dateFormat(date)}  `;
-    //             } else {
-    //                 return `${dayFormat(date)} ${dateFormat(date)}`;
-    //             }
-    //         });
-    //
-    //     // Append group and insert axis
-    //     const axisGroup = svg.append("g")
-    //         .call(x_axis);
-    //
-    //     // Apply CSS styles to make line and text bold
-    //     axisGroup.selectAll("line")
-    //         .style("stroke-width", "2"); // Make line bold
-    //
-    //     axisGroup.selectAll("text")
-    //         .style("font-weight", "bold"); // Make text bold
-    // }, [dateArray]);
-
-
     const [selectedDate, setSelectedDate] = useState(startDate);
 
     const handleDateChange = (newDate) => {
@@ -341,14 +292,14 @@ const MapSwitch = () => {
                 imageUnscale: [-128, 127],
                 bounds: [-180, -90, 180, 90],
                 numParticles: 2500,
-                maxAge: 50,
-                speedFactor: 2,
+                maxAge: 10,
+                speedFactor: 1,
                 color: [255, 255, 255, 235, 255, 235],
-                width: 1.5,
+                width: 0.1,
                 opacity: 0.5,
-                // textureParameters: {
-                //     [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-                // },
+                textureParameters: {
+                    [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
+                },
                 animate: true,
             })
         ].filter(Boolean);
@@ -365,15 +316,6 @@ const MapSwitch = () => {
             setSelectedLayers([...selectedLayers, layerName]);
         }
     };
-
-    // const handleLayerToggle = (layerName) => {
-    //     // Clear the selectedLayers array
-    //     setSelectedLayers([]);
-    //
-    //     // Add the clicked layer to the selectedLayers array
-    //     setSelectedLayers([layerName]);
-    // };
-
 
     const handleLayerToggle = (layerName) => {
         setSelectedLayers((prevSelectedLayers) => {
@@ -420,14 +362,12 @@ const MapSwitch = () => {
         }));
     };
 
-
     const handleMapViewZoomOut = () => {
         setInitialMapViewState((prevInitialMapViewState) => ({
             ...prevInitialMapViewState,
             zoom: prevInitialMapViewState.zoom / 1.2,
         }))
     };
-
 
     // const getTooltip = ({object}) => {
     //     if (!object) {
@@ -441,24 +381,6 @@ const MapSwitch = () => {
     //         longitude: ${Number.isFinite(lng) ? lng.toFixed(6) : ''}`;
     // }
 
-    const legendStyle = {
-        "background": 'linear-gradient(to right, rgb(98, 113, 184), rgb(98, 113, 184), rgb(98, 113, 184), rgb(98, 113, 184), rgb(61, 110, 163), rgb(74, 148, 170), rgb(74, 146, 148), rgb(77, 142, 124), rgb(76, 164, 76), rgb(103, 164, 54), rgb(162, 135, 64), rgb(162, 109, 92), rgb(141, 63, 92), rgb(151, 75, 145), rgb(95, 100, 160), rgb(91, 136, 161), rgb(91, 136, 161))',
-        "width": '100%',
-        "background-color": '#7c7c7c',
-        "white-space": 'nowrap',
-        "font-size": '12px',
-        "box-shadow": '0 0 4px 0 black'
-    }
-
-    const gradientStops = [
-        { color: 'blue', percentage: 0 },
-        { color: 'green', percentage: 20 },
-        { color: 'yellow', percentage: 40 },
-        { color: 'red', percentage: 60 },
-        { color: 'blue', percentage: 80 },
-        { color: 'gray', percentage: 100 }
-    ];
-
     const progressData = [
         // { percentage: 20, color: 'yellow-500' },
         // { percentage: 40, color: 'blue-500' },
@@ -466,11 +388,11 @@ const MapSwitch = () => {
         // { percentage: 80, color: 'yellow-500' },
         // { percentage: 100, color: 'red-900' },
 
-        { percentage: 0, color: 'yellow-500' },
-        { percentage: 20, color: 'blue-500' },
-        { percentage: 40, color: 'green-500' },
-        { percentage: 50, color: 'yellow-500' },
-        { percentage: 60, color: 'red-900' },
+        {percentage: 0, color: 'yellow-500'},
+        {percentage: 20, color: 'blue-500'},
+        {percentage: 40, color: 'green-500'},
+        {percentage: 50, color: 'yellow-500'},
+        {percentage: 60, color: 'red-900'},
     ];
 
     const [clickedtext, setClickedtext] = useState({})
@@ -493,43 +415,44 @@ const MapSwitch = () => {
             });
 
             return (
-                <div className="absolute bg-transparent" style={{left: info.x, top: info.y}}>
-                    {/*<div>*/}
-                    {/*    <MinusIcon className="h-4 w-4"/>*/}
-                    {/*    /!*<XMarkIcon className="h-4 w-4" onClick={turnOffMarker}/>*!/*/}
-                    {/*    <div className="flex">*/}
-                    {/*        <div className="relative w-1/4">*/}
-                    {/*            <div className="absolute top-0 right-0">*/}
-                    {/*                <XMarkIcon className="h-4 w-4" onClick={turnOffMarker}/>*/}
-                    {/*            </div>*/}
-                    {/*            Div 1*/}
+                <div className="absolute bg-transparent" style={{left: info.x - 15, top: info.y - 15}}>
+                    {!openBottomDrawer ?
+                        (
+                            <div className="max-w-md mx-auto overflow-hidden shadow-lg relative">
 
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
+                                {/*<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>*/}
 
-                    <div className="max-w-md mx-auto overflow-hidden shadow-lg relative">
-                        <StopCircleIcon className="h-6 w-6 absolute top-2 left-0"/>
-                        <XMarkIcon className="h-6 w-6 absolute top-2 right-2 p-1" onClick={turnOffMarker}/>
-                        <Tooltip content="Forcast of this location" className="text-xs">
-                            <ChevronDownIcon className="h-8 w-8 absolute top-6 right-5 p-2 bg-white rounded-full font-bold" onClick={openBottomDrawerHandle}/>
-                        </Tooltip>
+                                <StopCircleIcon className="h-6 w-6 absolute top-2 left-0"/>
+                                <XMarkIcon className="h-6 w-6 absolute top-2 right-2 p-1" onClick={turnOffMarker}/>
+                                <Tooltip content="Forcast of this location" className="text-xs">
+                                    <ChevronDownIcon
+                                        className="h-8 w-8 absolute top-6 right-5 p-2 bg-white rounded-full font-bold"
+                                        onClick={openBottomDrawerHandle}/>
+                                </Tooltip>
 
-                        {/*<button className="absolute top-2 right-2 p-1 bg-gray-50 text-black text-xs rounded-full mb-1">X</button>*/}
-                        <div className="p-4">
-                            <h5 className="text-xl font-bold mt-3">
-                                <p>coordinate: {info.coordinate[0]}</p>
-                                <p>{info.coordinate[1]}</p>
-                                <p>pixelColor: {pixelColor}</p>
-                            </h5>
-                        </div>
-                    </div>
+                                {/*<button className="absolute top-2 right-2 p-1 bg-gray-50 text-black text-xs rounded-full mb-1">X</button>*/}
+                                <div className="p-4">
+                                    <h5 className="text-xl font-bold mt-3">
+                                        <p>coordinate: {info.coordinate[0]}</p>
+                                        <p>{info.coordinate[1]}</p>
+                                        <p>pixelColor: {pixelColor}</p>
+                                    </h5>
+                                </div>
+                            </div>
+
+                        ) : (
+                            <StopCircleIcon className="h-4 w-4 absolute top-2 left-0"/>
+                            // <div>
+                            //     {/*<StopCircleIcon className="animate-ping h-3 w-3 absolute top-2 left-0"/>*/}
+                            //     {/*<div className="animate-ping h-6 w-6 bg-blue-500 rounded-full"></div>*/}
+                            // </div>
+                            // <div className="h-4 w-4 relative">
+                            //     <div className="rounded-full bg-transparent border-4 border-blue-500 absolute -inset-0 animate-expand"><StopCircleIcon className="animate-ping h-6 w-6 absolute top-2 left-0"/></div>
+                            // </div>
+
+                        )
+                    }
                 </div>
-                // <Tooltip content="Material Tailwind" placement="top">
-                //     <div className="absolute bg-transparent" style={{left: info.x, top: info.y}}>You clicked the map {info.x} {info.y}</div>
-                // </Tooltip>
-                // <div style={{left: , top: y}}>You clicked the map {info.x} {info.y}</div>
-
             )
         }
     }
@@ -542,39 +465,30 @@ const MapSwitch = () => {
     return (
         <div>
             <DeckGL
-                // style={{width: "100vw", height: "100vh"}}
                 layers={layers}
                 initialViewState={isGlobeView ? viewport : initialMapViewState}
                 controller={true}
-                // effects={[lightingEffect]}
+                effects={[lightingEffect]}
                 // views={MAP_VIEW}
                 onClick={expandTooltip}
             >
                 {isGlobeView ? (
-                    <GlobeView id="globe" repeat={true} resolution={5} views={'globe'} > </GlobeView>
+                    <GlobeView id="globe" repeat={true} resolution={5} views={'globe'}> </GlobeView>
                 ) : (
                     <MapView id="map" repeat={true}>
                         <Map
                             // style={{width: "100vw", height: "100vh"}}
-                            // mapStyle="https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json"
+                            mapStyle="https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json"
                         >
                         </Map>
                     </MapView>
                 )}
-
-                {/*<div className="absolute z-50">*/}
-                {/*    <Marker longitude={90} latitude={23} anchor="bottom">*/}
-                {/*        <PlusIcon className="h-16 w-16 z-50"/>*/}
-                {/*    </Marker>*/}
-                {/*</div>*/}
-
             </DeckGL>
 
-
-             {/*Main search bar*/}
+            {/*Main search bar*/}
             <div className="absolute flex items-center ml-4">
                 {textToDisplay(clickedtext)}
-               <Typography variant="h3"> Logo </Typography>
+                <Typography variant="h3"> Logo </Typography>
                 <div className="p-2 w-72">
                     {/*<Input icon={<MagnifyingGlassIcon className="h-5 w-5 text-black" />} label="Search" color="black" className="border-white bg-white" />*/}
                     <Input
@@ -707,29 +621,8 @@ const MapSwitch = () => {
 
 
             {/* Bottom left icon */}
-            <div className="absolute bottom-10 left-14 w-1/2">
-                {/*<div className="">*/}
-                {/*    <div style={{height: 8, width: '100%', display: 'flex', flexDirection: 'row'}}>*/}
-                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(254, 246, 181)'}}/>*/}
-                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 221, 154)'}}/>*/}
-                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 194, 133)'}}/>*/}
-                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(255, 166, 121)'}}/>*/}
-                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(250, 138, 118)'}}/>*/}
-                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(241, 109, 122)'}}/>*/}
-                {/*        <div style={{flex: '0 0 14.28%', background: 'rgb(225, 83, 131)'}}/>*/}
-                {/*    </div>*/}
-                {/*    <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>*/}
-                {/*        <div style={{width: '14.28%'}}>0</div>*/}
-                {/*        <div style={{width: '14.28%'}}>25</div>*/}
-                {/*        <div style={{width: '14.28%'}}>50</div>*/}
-                {/*        <div style={{width: '14.28%'}}>100</div>*/}
-                {/*        <div style={{width: '14.28%'}}>300</div>*/}
-                {/*        <div style={{width: '14.28%'}}>500</div>*/}
-                {/*        <div style={{width: '14.28%'}}>1000</div>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
-
-                <TimeSlider />
+            <div className="absolute bottom-10 left-14 w-1/2 z-50">
+                <TimeSlider/>
             </div>
 
             {/* Bottom right icon */}
@@ -752,7 +645,7 @@ const MapSwitch = () => {
 
                 <div className="flex flex-col items-center justify-center w-72">
                     <h1 className="text-xs">Temperature Bar</h1>
-                    <TemperatureBar progressData={progressData} />
+                    <TemperatureBar progressData={progressData}/>
                 </div>
 
             </div>

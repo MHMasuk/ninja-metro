@@ -3,14 +3,15 @@
 import React from "react";
 import {
     Drawer,
-    Button,
     Typography,
-    IconButton, Tooltip, List, ListItem, ListItemPrefix, ListItemSuffix, Chip,
+    IconButton,
+    Tooltip
 } from "@material-tailwind/react";
 import {ChevronLeftIcon, FireIcon, MapPinIcon} from "@heroicons/react/24/solid";
 
 export function BottomDrawer({handleLayerToggle, openBottomDrawerHandle, closeBottomDrawerHandle, openBottomDrawer, locationInfo}) {
     console.log("locationInfo IN BOTTOM DRAWER", locationInfo)
+
     return (
         <React.Fragment>
             <Tooltip content="More layers" placement="left-end">
@@ -20,47 +21,34 @@ export function BottomDrawer({handleLayerToggle, openBottomDrawerHandle, closeBo
             </Tooltip>
 
             <Drawer open={openBottomDrawer} onClose={closeBottomDrawerHandle} overlay={false} placement={"bottom"} className="p-1 bg-blend-soft-light">
-                <Typography variant="h5" color="blue-gray">
-                    Forecast of coordinate: {locationInfo.coordinate}
-                </Typography>
+                <div className="mb-6 flex items-center justify-between">
+                    <Typography variant="h5" color="blue-gray">
+                        Forecast of coordinate: {locationInfo.coordinate}
+                    </Typography>
+                    <IconButton
+                        variant="text"
+                        color="blue-gray"
+                        onClick={closeBottomDrawerHandle}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="currentColor"
+                            className="h-5 w-5"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
+                    </IconButton>
+                </div>
                 <p>{locationInfo.coordinate}</p>
                 <p>{locationInfo.x}</p>
                 <p>{locationInfo.y}</p>
-                {/*<div className="mb-6 flex items-center justify-between">*/}
-                    {/*<Typography variant="h5" color="blue-gray">*/}
-                    {/*    Material Tailwind*/}
-                    {/*</Typography>*/}
-                    {/*<List className="p-0">*/}
-                    {/*    <ListItem*/}
-                    {/*        className="group rounded-none py-1.5 px-3 text-sm font-normal text-blue-gray-700 hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white"*/}
-                    {/*        onClick={() => handleLayerToggle('ColorRemap')}*/}
-                    {/*    >*/}
-                    {/*        <ListItemPrefix>*/}
-                    {/*            <FireIcon className="h-5 w-5"/>*/}
-                    {/*        </ListItemPrefix>*/}
-                    {/*        Temperature*/}
-                    {/*    </ListItem>*/}
-                    {/*    <ListItem*/}
-                    {/*        className="rounded-none py-1.5 px-3 text-sm font-normal text-blue-gray-700 hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white"*/}
-                    {/*        onClick={() => handleLayerToggle('mvtLayer')}*/}
-                    {/*    >*/}
-                    {/*        <ListItemPrefix>*/}
-                    {/*            <MapPinIcon className="h-5 w-5"/>*/}
-                    {/*        </ListItemPrefix>*/}
-                    {/*        Wind*/}
-                    {/*    </ListItem>*/}
-                    {/*    <ListItem*/}
-                    {/*        className="rounded-none py-1.5 px-3 text-sm font-normal text-blue-gray-700 hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white"*/}
-                    {/*        onClick={() => handleLayerToggle('ColorRemap')}*/}
-                    {/*    >*/}
-                    {/*        <ListItemPrefix>*/}
-                    {/*            <FireIcon className="h-5 w-5"/>*/}
-                    {/*        </ListItemPrefix>*/}
-                    {/*        Fire*/}
-                    {/*    </ListItem>*/}
-                    {/*</List>*/}
-
-                {/*</div>*/}
             </Drawer>
         </React.Fragment>
     );
