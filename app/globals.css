@@ -95,10 +95,11 @@ body {
 
 .slider-date-range {
   position: absolute;
-  bottom: -20px;
-  transform: translateX(-50%);
+  bottom: -15px;
+  /*transform: translateX(-50%);*/
   font-size: 12px;
-  white-space: nowrap; /* Prevents date overflow */
+  /*white-space: nowrap; !* Prevents date overflow *!*/
+
 }
 
 .date-divider {
@@ -126,4 +127,40 @@ body {
 
 .animate-expand {
     animation: expand 1s ease-out;
+}
+
+
+
+/* Style the range input track */
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: #ccc; /* Set the track background color */
+    outline: none;
+    margin: 0;
+}
+
+/* Style the thumb (slider knob) */
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #000000; /* Set the thumb color */
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Style the tick marks */
+.slider::before {
+    content: "";
+    display: block;
+    width: 4px; /* Adjust the width as needed for your tick marks */
+    height: 4px; /* Adjust the height as needed for your tick marks */
+    background: #007BFF; /* Set the tick mark color */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
 }

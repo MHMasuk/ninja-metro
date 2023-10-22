@@ -185,7 +185,7 @@ const TimeSlider = () => {
 
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
-        const options = {month: 'short', day: 'numeric'};
+        const options = {weekday: 'short', month: 'short', day: 'numeric'};
         return date.toLocaleString('en-US', options);
     };
 
@@ -217,8 +217,11 @@ const TimeSlider = () => {
         return dateRange.map((date, index) => (
             <span
                 key={index}
-                className="slider-date-range"
-                style={{left: `${(100 / (dateRange.length - 1)) * index}%`}}
+                className="absolute text-md"
+                style={{
+                    left: `${(100 / (dateRange.length)) * index + 3}%`,
+                    // textAlign: 'mi' // Center the text
+                }}
             >
                 {formatDate(date)}
             </span>
@@ -234,9 +237,13 @@ const TimeSlider = () => {
         // Calculate the left position based on the selectedDateTime
         const leftPosition = (100 / (dateRange.length * timesPerDay.length - 1)) * selectedDateTime + '%';
 
+        console.log("leftPosition", leftPosition)
+        console.log("formattedDate, formattedTime", formattedDate, formattedTime, selectedDate)
+        console.log("selectedDateTime ", selectedDateTime)
+
         return (
-            <div className="selected-date-time" style={{left: leftPosition}}>
-                Date and Time: {formattedDate} - {formattedTime}
+            <div className="selected-date-time absolute bg-gray-900 rounded-md text-gray-300 p-1 overflow-hidden" style={{left: leftPosition}}>
+                {formattedDate} - {formattedTime}
             </div>
         );
     };
@@ -253,8 +260,10 @@ const TimeSlider = () => {
             </div>
             <div className="w-full">
                 <div className="mb-1 relative">
-
-                    <label className="block text-black-700 font-bold text-sm mb-2">
+                    {/*{renderDateRange()}*/}
+                    <label
+                        className="text-black-700 text-sm mb-10 p-4"
+                    >
                         {renderSelectedDateTime()}
                     </label>
                     <input
@@ -263,15 +272,39 @@ const TimeSlider = () => {
                         max={dateRange.length * timesPerDay.length - 1}
                         value={selectedDateTime}
                         onChange={handleDateTimeChange}
-                        className="slider w-full"
+                        className="w-full z-50 relative rounded-full bg-gray-800"
                         ref={sliderRef}
                     />
-                    <div className="w-full flex justify-between text-xs px-2 -mt-1">
-                        {dateRange.map((time, index) => (
-                            <span key={index}>|</span>
+                    {/*<div className="w-full flex justify-between text-xs px-1 -mt-3.5">*/}
+                    {/*    {dateRange.map((time, index) => (*/}
+                    {/*        // <span key={index} className="text-lg">|</span>*/}
+                    {/*        <div key={index} className="text-xm">*/}
+                    {/*            <div>{timesPerDay[index % timesPerDay.length]}</div>*/}
+                    {/*            <div>|</div>*/}
+                    {/*            /!* Add a separator between date and time *!/*/}
+                    {/*        </div>*/}
+                    {/*    ))}*/}
+                    {/*</div>*/}
+
+                    <div className="w-full flex justify-between text-xs -mt-4">
+                        {dateRange.map((date, index) => (
+                            <React.Fragment key={index}>
+                                {index < dateRange.length && (
+                                    <p className="text-lg" style={{ width: `${100 / (dateRange.length - 1)}%` }}>| <span className="text-xs"> {formatDate(date)}</span></p>
+                                )}
+                                {/*{timesPerDay.map((time, timeIndex) => (*/}
+                                {/*    <React.Fragment key={timeIndex}>*/}
+                                {/*        <span className="text-xm">|</span>*/}
+                                {/*        /!* Add the time text here if needed *!/*/}
+                                {/*    </React.Fragment>*/}
+                                {/*))}*/}
+                            </React.Fragment>
                         ))}
                     </div>
-                    <div className="slider-date-range-container">{renderDateRange()}</div>
+
+                    {/*<div className="slider-date-range-container bg-amber-600">*/}
+                    {/*    {renderDateRange()}*/}
+                    {/*</div>*/}
                 </div>
             </div>
         </div>

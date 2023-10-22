@@ -16,7 +16,7 @@ import {MVTLayer} from '@deck.gl/geo-layers';
 import {ParticleLayer} from 'deck.gl-particle';
 import {readPixelsToArray} from '@luma.gl/core';
 
-import Map, {Marker, NavigationControl, ScaleControl, Popup} from 'react-map-gl/maplibre';
+import Map, {Marker, NavigationControl, ScaleControl, Popup, useMap} from 'react-map-gl/maplibre';
 import chroma from 'chroma-js';
 import {scaleLinear} from "d3-scale";
 import * as d3 from 'd3';
@@ -74,6 +74,8 @@ import ProgressBar from "@/app/components/Scale/ProgressBar";
 import TemperatureBar from "@/app/components/Scale/TemparatureBar";
 import TimeSlider from "@/app/components/slider/TimeSlider";
 import {ChevronDownIcon, StopCircleIcon, XMarkIcon} from "@heroicons/react/24/outline";
+// import ArchTimeSlider from "@/app/components/slider/ArchTimeSlider";
+// import TimeSliderComponent from "@/app/components/slider/ArchTimeSlider";
 
 // create ambient light source
 const ambientLight = new AmbientLight({
@@ -462,6 +464,9 @@ const MapSwitch = () => {
         setClickedtext({})
     }
 
+
+    // const new_map = map.getMap()
+
     return (
         <div>
             <DeckGL
@@ -471,6 +476,7 @@ const MapSwitch = () => {
                 effects={[lightingEffect]}
                 // views={MAP_VIEW}
                 onClick={expandTooltip}
+                // ref={map}
             >
                 {isGlobeView ? (
                     <GlobeView id="globe" repeat={true} resolution={5} views={'globe'}> </GlobeView>
@@ -480,6 +486,7 @@ const MapSwitch = () => {
                             // style={{width: "100vw", height: "100vh"}}
                             mapStyle="https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json"
                         >
+
                         </Map>
                     </MapView>
                 )}
@@ -621,13 +628,15 @@ const MapSwitch = () => {
 
 
             {/* Bottom left icon */}
-            <div className="absolute bottom-10 left-14 w-1/2 z-50">
+            <div className="absolute bottom-5 left-3 w-2/3 z-50">
                 <TimeSlider/>
+                {/*<ArchTimeSlider />*/}
+                {/*<TimeSliderComponent />*/}
             </div>
 
             {/* Bottom right icon */}
             {/* This all are common layer */}
-            <div className="absolute bottom-10 right-5 text-right">
+            <div className="absolute bottom-5 right-5 text-right">
                 <div className="mb-5">
                     <Tooltip content="Particles" placement="left-end">
                         <IconButton
