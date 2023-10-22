@@ -12,6 +12,8 @@ import MapSwitchNew from "@/app/components/Map/MapSwitchNew";
 // import MapBoxMap from "@/app/components/Map/MapBoxMap";
 // import DemoMainMap from "@/app/components/demoApp/DemoMainMap";
 
+import 'rsuite/dist/rsuite.min.css';
+
 export default function Home() {
   return (
     <main className="relative min-h-screen">

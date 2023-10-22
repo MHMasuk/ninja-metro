@@ -74,6 +74,9 @@ import ProgressBar from "@/app/components/Scale/ProgressBar";
 import TemperatureBar from "@/app/components/Scale/TemparatureBar";
 import TimeSlider from "@/app/components/slider/TimeSlider";
 import {ChevronDownIcon, StopCircleIcon, XMarkIcon} from "@heroicons/react/24/outline";
+import ReactRangeSlider from "@/app/components/slider/react_range_slider";
+import RsuiteSlider from "@/app/components/slider/RsuiteSlider";
+import RsuiteSliderNew from "@/app/components/slider/RsuiteSliderNew";
 // import ArchTimeSlider from "@/app/components/slider/ArchTimeSlider";
 // import TimeSliderComponent from "@/app/components/slider/ArchTimeSlider";
 
@@ -629,9 +632,12 @@ const MapSwitch = () => {
 
             {/* Bottom left icon */}
             <div className="absolute bottom-5 left-3 w-2/3 z-50">
-                <TimeSlider/>
+                {/*<TimeSlider/>*/}
                 {/*<ArchTimeSlider />*/}
                 {/*<TimeSliderComponent />*/}
+                {/*<ReactRangeSlider />*/}
+                {/*<RsuiteSlider />*/}
+                <RsuiteSliderNew />
             </div>
 
             {/* Bottom right icon */}

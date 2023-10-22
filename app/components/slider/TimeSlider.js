@@ -242,11 +242,30 @@ const TimeSlider = () => {
         console.log("selectedDateTime ", selectedDateTime)
 
         return (
-            <div className="selected-date-time absolute bg-gray-900 rounded-md text-gray-300 p-1 overflow-hidden" style={{left: leftPosition}}>
+            <div className="selected-date-time absolute bg-gray-900 rounded-md text-gray-300 p-1" style={{left: leftPosition, maxWidth: '90%', right: '5%'}}>
                 {formattedDate} - {formattedTime}
             </div>
         );
     };
+
+    // const renderSelectedDateTime = () => {
+    //     const selectedDate = dateRange[Math.floor(selectedDateTime / timesPerDay.length)];
+    //     const selectedTime = timesPerDay[selectedDateTime % timesPerDay.length];
+    //     const formattedDate = formatDate(selectedDate);
+    //     const formattedTime = selectedTime;
+    //
+    //     // Calculate the left position based on the selectedDateTime
+    //     const leftPosition = (100 / (dateRange.length * timesPerDay.length - 1)) * selectedDateTime + '%';
+    //
+    //     // Determine the right position to make the text appear on the left when near the right edge
+    //     const rightPosition = (100 - parseFloat(leftPosition)) + '%';
+    //
+    //     return (
+    //         <div className="absolute bg-gray-900 rounded-md text-gray-300 p-1 overflow-hidden" style={{left: leftPosition, right: rightPosition, maxWidth: '90%'}}>
+    //             {formattedDate} - {formattedTime}
+    //         </div>
+    //     );
+    // };
 
     return (
         <div className="flex justify-between items-center">
