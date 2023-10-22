@@ -495,18 +495,18 @@ const MapSwitch = () => {
             {/*Main search bar*/}
             <div className="absolute flex items-center ml-4">
                 {textToDisplay(clickedtext)}
-                <Typography variant="h3"> Logo </Typography>
+                <Typography variant="h3"> MET Studio </Typography>
                 <div className="p-2 w-72">
                     {/*<Input icon={<MagnifyingGlassIcon className="h-5 w-5 text-black" />} label="Search" color="black" className="border-white bg-white" />*/}
                     <Input
                         type="email"
                         placeholder="Search Location"
-                        className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
+                        className="h-3 !border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
                         labelProps={{
                             className: "hidden",
                         }}
                         containerProps={{className: "min-w-[100px]"}}
-                        icon={<MagnifyingGlassIcon className="h-5 w-5 text-black"/>}
+                        icon={<MagnifyingGlassIcon className="h-4 w-5 text-black"/>}
                     />
                 </div>
             </div>
